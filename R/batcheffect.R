@@ -114,7 +114,9 @@ batchEffectUI <- function (id) {
                 DT::dataTableOutput(ns("filteredDetails"))),
                 uiOutput(ns("afterbatchtable"))
           )
-        )),
+        ),
+        actionButton("goDE", "Go to DE Analysis!", styleclass = "primary"),
+        actionButton("goQCplots", "Go to QC plots!", styleclass = "primary")),
       shinydashboard::box(title = "Plots",
         solidHeader = T, status = "info",  width = 12, 
         fluidRow(column(1, div()),
@@ -122,14 +124,15 @@ batchEffectUI <- function (id) {
                 tabPanel(id = ns("PCA"), "PCA",
                     column(5,
                         getPCAPlotUI(ns("beforeCorrectionPCA"))),
-                    column(2,  shinydashboard::box(title = "Before Correction",
-                        solidHeader = TRUE, status = "info",
-                        width = 12,
+                    column(2,  
+                        shinydashboard::box(title = "PCA Controls",
+                        solidHeader = T, status = "info",  width = 12, 
+                        tabsetPanel(
+                        tabPanel ("<== Before",
                         pcaPlotControlsUI(ns("beforeCorrectionPCA"))),
-                        shinydashboard::box(title = "After Correction",
-                        solidHeader = TRUE, status = "info",
-                        width = 12,
-                        pcaPlotControlsUI(ns("afterCorrectionPCA")))),
+                        conditionalPanel(paste0("input['", ns("submitBatchEffect"), "']"), 
+                        tabPanel ( "After ==>",
+                        pcaPlotControlsUI(ns("afterCorrectionPCA"))))))),
                     column(5,
                         getPCAPlotUI(ns("afterCorrectionPCA")))
                 ),
@@ -162,14 +165,14 @@ batchEffectUI <- function (id) {
 #'
 #' @examples
 #'    
-#'     x <- normalizationMethods()
+#'     x <- normalizationMethods("batch")
 #'
 #' @export
 #'
 normalizationMethods <- function(id) {
     ns <- NS(id)
     selectInput(ns("norm_method"), "Normalization Method:",
-        choices <- c("none", "DESeq2", "TMM", "RLE", "upperquartile"))
+        choices = c("none", "DESeq2", "TMM", "RLE", "upperquartile"))
 }
 
 #' batchMethod
